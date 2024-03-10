@@ -1,5 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { useAtom } from "jotai";
+import { showMonetaryValueAtom } from "@/Atoms";
 
 type Props = {
   title?: string;
@@ -16,9 +18,19 @@ function Icon(props: {
 }
 
 export function Header({ title, subtitle }: Props) {
+  const [showMonetaryValue, setShowMonetaryValue] = useAtom(
+    showMonetaryValueAtom
+  );
+
+  function handlePressOpen() {
+    setShowMonetaryValue(!showMonetaryValue);
+  }
+
   return (
     <View style={s.container}>
-      <View style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+      <View
+        style={{ display: "flex", flexDirection: "row", alignItems: "center" }}
+      >
         <TouchableOpacity style={s.avatar}>
           <Icon name="user" color="#2f95dc" />
         </TouchableOpacity>
@@ -26,8 +38,12 @@ export function Header({ title, subtitle }: Props) {
           Oi, <Text style={s.subtitle}>Luma</Text>
         </Text>
       </View>
-      <TouchableOpacity style={s.showMonetaryValuesButton}>
-        <Icon name="eye" color="black" size={24} />
+      <TouchableOpacity style={s.showMonetaryValuesButton} onPress={handlePressOpen}>
+        {showMonetaryValue ? (
+          <Icon name="eye" color="black" size={24} />
+        ) : (
+          <Icon name="eye-off" color="black" size={24} />
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -41,6 +57,7 @@ const s = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 32,
@@ -52,7 +69,7 @@ const s = StyleSheet.create({
   },
   avatar: {
     padding: 10,
-    backgroundColor: "lightgray",
+    backgroundColor: "#EEEEEE",
     borderRadius: 50,
   },
   showMonetaryValuesButton: {
