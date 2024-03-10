@@ -6,10 +6,10 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { benefitsDatabase } from "@/database/benefits";
 import { BenefitProp } from "@/database/types";
-import { convertFromCentToReal } from "../../../(tabs)";
 import Loading from "@/components/Loading";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BenefitIcon from "@/components/BenefitIcon";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 export default function Confirm() {
   const router = useRouter();
@@ -45,40 +45,44 @@ export default function Confirm() {
           <Text style={styles.title}>Transferência de saldo</Text>
         </View>
       </View>
-      <Text>
+      <Text style={{ marginVertical: 20 }}>
         Escolha uma categoria de benefício para transferir:{" "}
-        {convertFromCentToReal(parseFloat(amount))} de {benefit.name}
+        <Text style={{ fontWeight: "bold" }}>
+          {formatCurrency(parseFloat(amount))} de {benefit.name}
+        </Text>
       </Text>
 
       <FlatList
-        data={benefits}
+        data={benefits.filter((b) => b.slug !== slug)}
         keyExtractor={(item) => item.slug}
-        renderItem={({ item, index }) => (
-          <TouchableOpacity
-            onPress={() => {
-              router.push(
-                `/benefit/${slug}/transfer/confirm?amount=${amount}&item=${item.slug}`
-              );
-            }}
-            style={styles.benefitItem}
-          >
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
+        renderItem={({ item, index }) =>
+            <TouchableOpacity
+              onPress={() => {
+                router.push(
+                  `/benefit/${slug}/transfer/confirm?amount=${amount}&item=${item.slug}`
+                );
               }}
+              style={styles.benefitItem}
             >
-              <BenefitIcon benefit={item} key={index} />
-              <View>
-                <Text>{item.name}</Text>
-                <Text>R$ {convertFromCentToReal(item.balance)}</Text>
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <BenefitIcon benefit={item} key={index} />
+                <View style={{ marginLeft: 20 }}>
+                  <Text style={{ fontSize: 16 }}>{item.name}</Text>
+                  <Text style={{ color: "#757575" }}>
+                    R$ {formatCurrency(item.balance)}
+                  </Text>
+                </View>
               </View>
-            </View>
 
-            <Feather name="chevron-right" size={24} color="#3767E0" />
-          </TouchableOpacity>
-        )}
+              <Feather name="chevron-right" size={24} color="#3767E0" />
+            </TouchableOpacity>
+        }
       />
 
       <StatusBar style="dark" />

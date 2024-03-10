@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity } from "react-native";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { Text, View } from "@/components/Themed";
 import { Feather } from "@expo/vector-icons";
@@ -7,11 +7,13 @@ import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { benefitsDatabase } from "@/database/benefits";
 import { BenefitProp, TransactionProp } from "@/database/types";
-import { convertFromCentToReal } from "../../../(tabs)";
+import { formatCurrency } from "@/utils/formatCurrency";
 import Loading from "@/components/Loading";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "@/components/Button";
 import { MaskedTextInput } from "react-native-mask-text";
+import BenefitTransferHeader from "@/components/BenefitTransferHeader";
+import BenefitIcon from "@/components/BenefitIcon";
 
 export default function Transfer() {
   const router = useRouter();
@@ -20,6 +22,16 @@ export default function Transfer() {
   const [benefit, setBenefit] = useState<BenefitProp>();
   const { slug, item } = params;
   const [amount, setAmount] = useState(0);
+
+  function handleContinueButton() {
+    if (amount === 0) {
+      Alert.alert("Valor inválido", "O valor deve ser maior que 0");
+      return;
+    }
+    router.push(
+      `/benefit/${slug}/transfer/category?item=${item}&amount=${amount}`
+    );
+  }
 
   useEffect(() => {
     benefitsDatabase.getBenefitBySlug(slug, setBenefit);
@@ -31,7 +43,7 @@ export default function Transfer() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top }]}>
+      <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
         <TouchableOpacity onPress={() => router.back()}>
           <SimpleLineIcons name="arrow-left-circle" size={42} color="#3767E0" />
         </TouchableOpacity>
@@ -39,7 +51,14 @@ export default function Transfer() {
           <Text style={styles.title}>Transferência de saldo</Text>
         </View>
       </View>
-      <Text>Escolha o valor que deseja retirar deste benefício</Text>
+      <Text
+        style={{
+          fontSize: 14,
+          textAlign: "center",
+        }}
+      >
+        Escolha o valor que deseja retirar deste benefício:
+      </Text>
       <View
         style={{
           flexDirection: "row",
@@ -50,24 +69,18 @@ export default function Transfer() {
       >
         <View
           style={{
-            width: 50,
-            height: 50,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: benefit.bgColor,
-            borderRadius: 9999,
             marginRight: 20,
           }}
         >
-          <Feather name={benefit.icon} size={24} />
+          <BenefitIcon benefit={benefit} />
         </View>
         <View>
           <Text style={{ fontSize: 18, color: "#757575" }}>{benefit.name}</Text>
           <Text style={{ color: "#BCBCBC", fontSize: 16 }}>
-            Valor atual: {convertFromCentToReal(benefit.balance)}
+            Valor atual: {formatCurrency(benefit.balance)}
           </Text>
           <Text style={{ color: "#BCBCBC", fontSize: 16 }}>
-            Valor fléxivel: {convertFromCentToReal(2000)}
+            Valor fléxivel: {formatCurrency(benefit.balance)}
           </Text>
         </View>
       </View>
@@ -95,18 +108,7 @@ export default function Transfer() {
       </View>
 
       <View style={{ justifyContent: "center" }}>
-        <Link
-          href={{
-            pathname: `/benefit/${slug}/transfer/category`,
-            params: {
-              item: item,
-              amount: amount,
-            },
-          }}
-          style={styles.button}
-        >
-          <Text style={styles.text}>Continuar</Text>
-        </Link>
+        <Button title="Continuar" onPress={handleContinueButton} />
       </View>
       <StatusBar style="dark" />
     </View>
@@ -122,6 +124,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
+    paddingBottom: 30,
   },
   title: {
     fontSize: 20,
@@ -137,11 +140,12 @@ const styles = StyleSheet.create({
     height: 40,
   },
   button: {
-    height: 48,
-    width: "100%",
+    padding: 18,
     backgroundColor: "#3767E0",
-    alignItems: "center",
+    display: "flex",
+    textAlign: "center",
     justifyContent: "center",
+    alignContent: "center",
     borderRadius: 4,
   },
   text: {
