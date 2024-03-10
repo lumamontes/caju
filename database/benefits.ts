@@ -6,14 +6,12 @@ const db = SQLite.openDatabase("caju.db");
 const insertMockDataIfNeeded = () => {
   db.transaction(
     (tx) => {
-      // Primeiro, verifica se a tabela já contém dados
       tx.executeSql(
         "SELECT COUNT(*) as count FROM benefits;",
         [],
         (_, { rows }) => {
           const count = rows.item(0).count;
           if (count === 0) {
-            // Se a tabela estiver vazia, insere os dados mockados
             const benefitsInicialData = [
               {
                 slug: "home-office",
@@ -41,14 +39,14 @@ const insertMockDataIfNeeded = () => {
                 name: "Mobilidade",
                 icon: "map-pin",
                 balance: 300 * 100,
-                bgColor:  "#FEE082"
+                bgColor: "#FEE082",
               },
               {
                 slug: "cultura",
                 name: "Cultura",
                 icon: "book-open",
                 balance: 350 * 100,
-                bgColor: "#75D0EA"
+                bgColor: "#75D0EA",
               },
               {
                 slug: "saude",
@@ -65,30 +63,29 @@ const insertMockDataIfNeeded = () => {
                 bgColor: "#F69BC6",
               },
             ];
-            benefitsInicialData.forEach(({ slug, name, icon, balance, bgColor }) => {
-              tx.executeSql(
-                "INSERT INTO benefits (slug, name, icon, balance, bgColor) VALUES (?, ?, ?, ?, ?);",
-                [
-                  slug,
-                  name,
-                  icon,
-                  balance,
-                  bgColor,
-                ],
-                () => console.log(`Benefício ${name} inserido com sucesso.`),
-                (transaction, error) => {
-                  console.error(`Erro ao inserir o benefício ${name}:`, error);
-                  return false; // Continua a propagação de erro
-                }
-              );
-            });
+            benefitsInicialData.forEach(
+              ({ slug, name, icon, balance, bgColor }) => {
+                tx.executeSql(
+                  "INSERT INTO benefits (slug, name, icon, balance, bgColor) VALUES (?, ?, ?, ?, ?);",
+                  [slug, name, icon, balance, bgColor],
+                  () => console.log(`Benefício ${name} inserido com sucesso.`),
+                  (transaction, error) => {
+                    console.error(
+                      `Erro ao inserir o benefício ${name}:`,
+                      error
+                    );
+                    return false;
+                  }
+                );
+              }
+            );
           } else {
             console.log("Dados mockados já inseridos anteriormente.");
           }
         },
         (transaction, error) => {
-          console.error("Erro ao verificar a tabela beneficios:", error);
-          return true; // para parar a propagação do erro
+          console.error("Erro ao verificar a tabela benefits:", error);
+          return true;
         }
       );
     },
@@ -122,13 +119,17 @@ const totalBenefitsBalance = (
 ) => {
   db.transaction(
     (tx) => {
-      tx.executeSql("SELECT SUM(balance) as total FROM benefits", [], (_, { rows }) => {
-        setTotal(rows._array[0].total);
-      });
+      tx.executeSql(
+        "SELECT SUM(balance) as total FROM benefits",
+        [],
+        (_, { rows }) => {
+          setTotal(rows._array[0].total);
+        }
+      );
     },
     (err) => console.log("Error getting total balance", err)
   );
-}
+};
 
 const getBenefitBySlug = (
   slug: string,
@@ -136,18 +137,34 @@ const getBenefitBySlug = (
 ) => {
   db.transaction(
     (tx) => {
-      tx.executeSql("SELECT * FROM benefits WHERE slug = ?", [slug], (_, { rows }) => {
-        setBenefit(rows._array[0]);
-      });
+      tx.executeSql(
+        "SELECT * FROM benefits WHERE slug = ?",
+        [slug],
+        (_, { rows }) => {
+          setBenefit(rows._array[0]);
+        }
+      );
     },
     (err) => console.log("Error getting benefit by slug", err)
   );
-}
+};
 
+const updateBenefitBalance = (slug: string, newBalance: number) => {
+  db.transaction(
+    (tx) => {
+      tx.executeSql("UPDATE benefits SET balance = ? WHERE slug = ?", [
+        newBalance,
+        slug,
+      ]);
+    },
+    (err) => console.log("Error updating benefit balance", err)
+  );
+};
 
 export const benefitsDatabase = {
   listBeneficios,
   totalBenefitsBalance,
   insertMockDataIfNeeded,
-  getBenefitBySlug
+  getBenefitBySlug,
+  updateBenefitBalance,
 };

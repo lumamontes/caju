@@ -4,16 +4,19 @@ export interface BenefitProp {
     slug: string;
     name: string;
     icon: React.ComponentProps<typeof Feather>["name"];
-    balance: number; // Agora como número
+    balance: number; 
     bgColor: string;
   }
   
 export interface TransactionProp {
-    id: number;
+    id?: number;
     title: string;
-    value: number; // Já é um número, mantemos
+    value: number; 
     type: 'income' | 'outcome';
-    benefitSlug: string; // Referência ao slug do benefício
-    date: string; // Formato de data ISO como string
+    benefit: string; 
+    prevBenefit: string;
+    date: string; 
+    bgColor?: string;
+    icon?: React.ComponentProps<typeof Feather>["name"];
   }
   
