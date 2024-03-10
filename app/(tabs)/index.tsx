@@ -1,63 +1,97 @@
 import { SafeAreaView, StyleSheet, TouchableOpacity } from "react-native";
-import EditScreenInfo from "@/components/EditScreenInfo";
 import { Text, View } from "@/components/Themed";
 import { Header } from "@/components/Header";
 import Beneficios from "@/components/Beneficios";
-import Beneficio from "@/components/Beneficio";
 import { Feather } from "@expo/vector-icons";
+import ExpandableContainer from "@/components/ExpandableContainer";
+import { useEffect, useState } from "react";
+import InfoModal from "@/components/InfoModal";
+import { useAtom } from "jotai";
+import { showMonetaryValueAtom } from "@/Atoms";
+import { FreeBalance } from "@/components/FreeBalance";
+import NextBenefit from "@/components/NextBenefit";
+import FlexibleValue from "@/components/FlexibeValue";
+import handleHideMonetaryValue from "@/utils/handleHideMonetaryValue";
+import { database } from "@/database/init";
+import { benefitsDatabase } from "@/database/benefits";
+
+export const convertFromCentToReal = (value: number) => {
+  return (value / 100).toFixed(2);
+};
 
 export default function TabOneScreen() {
+  const [showMonetaryValue] = useAtom(showMonetaryValueAtom);
+  const [showModal, setShowModal] = useState(false);
+  const [totalBenefitsBalance, setTotalBenefitsBalance] = useState(0);
+
+  const handleModal = () => {
+    setShowModal(!showModal);
+  };
+
+  useEffect(() => {
+    database.initDB();
+  }, []);
+
+  useEffect(() => {
+    benefitsDatabase.insertMockDataIfNeeded();
+  }, []);
+
+  useEffect(() => {
+    benefitsDatabase.totalBenefitsBalance(setTotalBenefitsBalance);
+  }, []);
+  
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <View style={styles.container}>
         <Header />
-        <Text style={styles.title}>BENEFÍCIOS</Text>
-        <Beneficios />
-        <View style={styles.text_container}>
-          <Text style={styles.bold}>Total em benefícios</Text>
-          <Text style={styles.bold}>R$ 200,00</Text>
-        </View>
-        <View
-          style={styles.separator}
-          lightColor="#eee"
-          darkColor="rgba(255,255,255,0.1)"
-        />
-        <Text style={[styles.bold, styles.title]}>
-          OUTROS SALDOS
+        <Text style={[styles.title, { paddingHorizontal: 20 }]}>
+          BENEFÍCIOS
         </Text>
-        <TouchableOpacity style={styles.saldo_container}>
-          <View style={styles.icon_container}>
-            <Feather name="check-circle" size={32} color="black" />
-            <Text style={styles.title}>SALDO LIVRE </Text>
-          </View>
-          <Text style={styles.money}>
-            R$ {""}
+        <Beneficios />
+        <View style={{ paddingVertical: 10, paddingHorizontal: 20 }}>
+          <View style={styles.text_container}>
+            <Text style={styles.bold}>Total em benefícios</Text>
             <Text style={styles.bold}>
-              100,00
+              R$
+              {showMonetaryValue
+                ? convertFromCentToReal(totalBenefitsBalance)
+                : handleHideMonetaryValue(
+                    convertFromCentToReal(totalBenefitsBalance)
+                  )}
             </Text>
+          </View>
+          <ExpandableContainer>
+            <FlexibleValue handleModal={handleModal} />
+            <NextBenefit />
+          </ExpandableContainer>
+        </View>
+        <View style={{ paddingHorizontal: 20 }}>
+          <Text style={[styles.bold, styles.title]}>OUTROS SALDOS</Text>
+          <FreeBalance balance="100,00" showMonetaryValue={showMonetaryValue} />
+
+          <Text style={[styles.bold, styles.title]}>AÇÕES</Text>
+          <TouchableOpacity>
+            <Text>Transferir saldo entre benefícios</Text>
+          </TouchableOpacity>
+        </View>
+
+        <InfoModal isVisible={showModal} onClose={handleModal}>
+          <Text style={{ textAlign: "center" }}>
+            A flexibidade para transferências entre beneficios é defnidia pela
+            sua empresa a cada nova recarga de créditos. Caso tenha alguma
+            dúvida sobre o valor flexível, recomendamos que converse diretamente
+            com seu RH.
           </Text>
-        </TouchableOpacity>
-      
-        <EditScreenInfo path="app/(tabs)/index.tsx" />
+        </InfoModal>
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  money: {
-    fontSize: 14,
-  },
-  icon_container: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 10,
-    flexDirection: "row",
-    backgroundColor: "violet",
-  },
   container: {
-    paddingHorizontal: 20,
+    flex: 1,
+    justifyContent: "flex-start",
   },
   bold: {
     fontWeight: "bold",
@@ -66,31 +100,18 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "space-between",
     flexDirection: "row",
-    paddingVertical: 20,
-  },
-  saldo_container: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    flexDirection: "row",
-    padding: 15,
-    backgroundColor: "violet",
-    borderRadius: 10,
-  },
-  saldo: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    flexDirection: "row",
+    paddingVertical: 40,
+    paddingBottom: 10,
   },
   title: {
     fontSize: 12,
     fontWeight: "bold",
     paddingVertical: 20,
+    marginLeft: 2,
   },
-  separator: {
-    height: 1,
-    width: "100%",
-    marginBottom: 30
+  expandable_container: {
+    display: "flex",
+    justifyContent: "space-between",
+    flexDirection: "row",
   },
 });
