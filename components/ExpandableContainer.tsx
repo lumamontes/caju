@@ -1,17 +1,20 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
-import Animated, {
-  SlideInDown,
-  FlipInEasyY,
-  SlideInLeft,
-  SlideInRight,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 import { Text, View } from "./Themed";
+import FlexibleValue from "./FlexibeValue";
+import NextBenefit from "./NextBenefit";
+import { formatCurrency } from "@/utils/formatCurrency";
+import handleHideMonetaryValue from "@/utils/handleHideMonetaryValue";
+import { showMonetaryValueAtom } from "@/Atoms";
+import { useAtom } from "jotai";
+import { benefitsDatabase } from "@/database/benefits";
 
 interface ExpandableContainerProps {
   title?: string;
-  children: ReactNode;
+  children?: ReactNode;
+  onHandleModal: () => void;
 }
 
 interface DescriptionProps {
@@ -20,34 +23,62 @@ interface DescriptionProps {
 
 const ExpandableContainer: React.FC<ExpandableContainerProps> & {
   Description: React.FC<DescriptionProps>;
-} = ({ title, children }) => {
+} = ({ title, children, onHandleModal }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showMonetaryValue] = useAtom(showMonetaryValueAtom);
+  const [totalBenefitsBalance, setTotalBenefitsBalance] = useState(0);
 
   const handlePress = () => {
     setIsOpen(!isOpen);
   };
 
+  useEffect(() => {
+    const init = async () => {
+      benefitsDatabase.totalBenefitsBalance(setTotalBenefitsBalance);
+    };
+    init();
+  }, []);
   return (
-    <TouchableOpacity style={styles.container} onPress={handlePress}>
-      {isOpen && <Animated.View>{children}</Animated.View>}
-      <View style={styles.header}>
-        {title && (
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>{title}</Text>
-          </View>
-        )}
-
-        {!title && (
-          <View
-            style={styles.separator}
-            lightColor="#eee"
-            darkColor="rgba(255,255,255,0.1)"
-          />
-        )}
-
-        <Feather name={isOpen ? "chevron-up" : "chevron-down"} size={24} color="black" />
+    <View style={{ paddingVertical: 10, paddingHorizontal: 20 }}>
+      <View style={styles.text_container}>
+        <Text style={styles.bold}>Total em benefícios</Text>
+        <Text style={styles.bold}>
+          R$
+          {showMonetaryValue
+            ? formatCurrency(totalBenefitsBalance)
+            : handleHideMonetaryValue(formatCurrency(totalBenefitsBalance))}
+        </Text>
       </View>
-    </TouchableOpacity>
+      <TouchableOpacity style={styles.contentContainer} onPress={handlePress}>
+        {isOpen && (
+          <Animated.View>
+            <FlexibleValue handleModal={() => onHandleModal()} />
+            <NextBenefit />
+          </Animated.View>
+        )}
+        <View style={styles.header}>
+          {title && (
+            <View style={styles.titleContainer}>
+              <Text style={styles.title}>{title}</Text>
+            </View>
+          )}
+
+          {!title && (
+            <View
+              style={styles.separator}
+              lightColor="#eee"
+              darkColor="rgba(255,255,255,0.1)"
+            />
+          )}
+
+          <Feather
+            name={isOpen ? "chevron-up" : "chevron-down"}
+            size={24}
+            color="black"
+          />
+        </View>
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -56,7 +87,7 @@ ExpandableContainer.Description = ({ children }: DescriptionProps) => (
 );
 
 const styles = StyleSheet.create({
-  container: {
+  contentContainer: {
     backgroundColor: "#fff",
   },
   title: {
@@ -80,6 +111,20 @@ const styles = StyleSheet.create({
   separator: {
     height: 1,
     width: "90%",
+  },
+  container: {
+    flex: 1,
+    justifyContent: "flex-start",
+  },
+  bold: {
+    fontWeight: "bold",
+  },
+  text_container: {
+    display: "flex",
+    justifyContent: "space-between",
+    flexDirection: "row",
+    paddingVertical: 40,
+    paddingBottom: 10,
   },
 });
 

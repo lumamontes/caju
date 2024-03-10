@@ -17,7 +17,7 @@ export default function FlexibleValue({ handleModal, isDisabled = false }: { han
         </TouchableOpacity>
         <Text>
             R$ 
-            {showMonetaryValue ? '100,00' : handleHideMonetaryValue('100,00')}
+            {showMonetaryValue ? '2.050,00' : handleHideMonetaryValue('2.050,00')}
         </Text>
       </View>
     );

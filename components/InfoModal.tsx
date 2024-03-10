@@ -8,7 +8,12 @@ export default function InfoModal({ isVisible, children, onClose }: any) {
         <View style={styles.contentContainer}>
             <Text style={styles.title}>Valor fléxivel</Text>
           <View>
-          {children}
+          <Text style={{ textAlign: "center" }}>
+            A flexibidade para transferências entre benefícios é definida pela
+            sua empresa a cada nova recarga de créditos. Caso tenha alguma
+            dúvida sobre o valor flexível, recomendamos que converse diretamente
+            com seu RH.
+          </Text>
           </View>
           <Button title="Entendi" onPress={onClose} />
         </View>

@@ -2,19 +2,17 @@ import { Feather } from "@expo/vector-icons";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import handleHideMonetaryValue from "@/utils/handleHideMonetaryValue";
 import { Link, router } from "expo-router";
-import { Header } from "./Header";
-import { convertFromCentToReal } from "@/app/(tabs)";
+import { formatCurrency } from "@/utils/formatCurrency";
 import { BenefitProp } from "@/database/types";
 import { useAtom } from "jotai";
 import { showMonetaryValueAtom } from "@/Atoms";
 
-export default function Beneficio({
+export default function Benefit({
   beneficio,
 }: {
   beneficio: BenefitProp;
 }) {
   const [showMonetaryValue] = useAtom(showMonetaryValueAtom);
-
   return (
     <Link
       asChild
@@ -33,11 +31,11 @@ export default function Beneficio({
 
           {showMonetaryValue ? (
             <Text style={styles.beneficioValor}>
-              {convertFromCentToReal(beneficio.balance)}
+              {formatCurrency(beneficio.balance)}
             </Text>
           ) : (
             <Text style={styles.beneficioValor}>
-              {handleHideMonetaryValue(convertFromCentToReal(beneficio.balance))}
+              {handleHideMonetaryValue(formatCurrency(beneficio.balance))}
             </Text>
           )}
         </View>

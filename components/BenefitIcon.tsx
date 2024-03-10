@@ -19,7 +19,6 @@ const BenefitIcon: React.FC<BenefitIconProps> = ({ benefit }) => {
         alignItems: "center",
         backgroundColor: benefit.bgColor,
         borderRadius: 9999,
-        marginRight: 20,
       }}
     >
       <Feather name={benefit.icon} size={24} />

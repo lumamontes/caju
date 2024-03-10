@@ -1,7 +1,7 @@
 import handleHideMonetaryValue from "@/utils/handleHideMonetaryValue";
 import { Feather } from "@expo/vector-icons";
-import { StyleSheet, TouchableOpacity } from "react-native";
-import { Text } from "./Themed";
+import { Pressable, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, View } from "./Themed";
 import Animated, { SlideInDown } from "react-native-reanimated";
 
 export function FreeBalance({
@@ -11,48 +11,39 @@ export function FreeBalance({
   showMonetaryValue: boolean;
   balance: string;
 }) {
-
   return (
-    <TouchableOpacity style={styles.saldo_container}>
-        <Text>
-        <Feather name="check-circle" size={32} color="black" />
-        <Text style={styles.title}>SALDO LIVRE</Text>
-      </Text>
-
-      <Text style={styles.money}>
+    <View style={styles.container}>
+      <View style={styles.icon}>
+          <Feather name="check-circle" size={32} color="black" />
+          <Text style={styles.title}>SALDO LIVRE</Text>
+      </View>
+      <Text>
         R$ {""}
         <Animated.Text entering={SlideInDown} exiting={SlideInDown}>
           {showMonetaryValue ? balance : handleHideMonetaryValue(balance)}
         </Animated.Text>
       </Text>
-    </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  money: {
-    fontSize: 14,
-},
-  bold: {
-    fontWeight: "bold",
-  },
-  saldo_container: {
-    padding: 15,
+  container: {
+        padding: 15,
     backgroundColor: "#DA83CF",
     borderRadius: 10,
-    paddingVertical: 20,
     display: "flex",
-    alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-between",
-
+    alignItems: "center",
+  },
+  icon: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#DA83CF",
   },
   title: {
-    fontSize: 12,
-    fontWeight: "bold",
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
+    marginLeft: 10,
+  }
 });

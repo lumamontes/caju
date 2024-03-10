@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
 import { useAtom } from "jotai";
 import { showMonetaryValueAtom } from "@/Atoms";
 
@@ -10,11 +10,11 @@ type Props = {
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function Icon(props: {
-  name: React.ComponentProps<typeof Feather>["name"];
+  name: React.ComponentProps<typeof AntDesign>["name"];
   color: string;
   size?: number;
 }) {
-  return <Feather size={props.size ?? 28} {...props} />;
+    return <AntDesign size={props.size ?? 28} {...props} />;
 }
 
 export function Header({ title, subtitle }: Props) {
@@ -32,7 +32,7 @@ export function Header({ title, subtitle }: Props) {
         style={{ display: "flex", flexDirection: "row", alignItems: "center" }}
       >
         <TouchableOpacity style={s.avatar}>
-          <Icon name="user" color="#2f95dc" />
+          <Icon name="user" color="#2f95dc"  />
         </TouchableOpacity>
         <Text style={s.title}>
           Oi, <Text style={s.subtitle}>Luma</Text>
@@ -42,7 +42,7 @@ export function Header({ title, subtitle }: Props) {
         {showMonetaryValue ? (
           <Icon name="eye" color="black" size={24} />
         ) : (
-          <Icon name="eye-off" color="black" size={24} />
+          <Icon name="eyeo" color="black" size={24} />
         )}
       </TouchableOpacity>
     </View>
