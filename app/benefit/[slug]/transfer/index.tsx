@@ -80,7 +80,7 @@ export default function Transfer() {
             Valor atual: {formatCurrency(benefit.balance)}
           </Text>
           <Text style={{ color: "#BCBCBC", fontSize: 16 }}>
-            Valor fléxivel: {formatCurrency(benefit.balance)}
+            Valor flexível: {formatCurrency(benefit.balance)}
           </Text>
         </View>
       </View>

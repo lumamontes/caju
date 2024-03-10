@@ -11,7 +11,7 @@ export default function FlexibleValue({ handleModal, isDisabled = false }: { han
       <View style={[styles.expandable_container]}>
         <TouchableOpacity onPress={handleModal} disabled={isDisabled}>
           <Text>
-            Valor fléxivel {""}
+            Valor flexível {""}
             <Feather name="info" size={16} color="black" />
           </Text>
         </TouchableOpacity>

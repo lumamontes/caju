@@ -6,7 +6,7 @@ export default function InfoModal({ isVisible, children, onClose }: any) {
     <Modal animationType="fade" transparent={true} visible={isVisible}>
       <View style={styles.modalContent}>
         <View style={styles.contentContainer}>
-            <Text style={styles.title}>Valor fléxivel</Text>
+            <Text style={styles.title}>Valor flexível</Text>
           <View>
           <Text style={{ textAlign: "center" }}>
             A flexibidade para transferências entre benefícios é definida pela
